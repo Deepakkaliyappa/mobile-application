@@ -510,7 +510,7 @@ function createPage(d, fmt, pageIndex) {
     "<tbody></tbody></table>" +
     '<div class="pg-foot">' + CONTINUE_HTML + "</div>" +
     "</div>" +
-    '<div class="pg-credit">Designed by ❤️ Durga Team</div>' +
+    '<div class="pg-credit">Original Copy-System Generated Document</div>' +
     '<div class="pg-num"></div>';
   return page;
 }
