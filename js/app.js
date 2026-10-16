@@ -851,3 +851,18 @@ function toggleTheme() {
   applyThemeUi();
 }
 applyThemeUi();
+//download file name.
+self.addEventListener("fetch", (event) => {
+  if (event.request.url.endsWith(".js") || event.request.url.endsWith(".html")) {
+    event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
+  }
+});
+function pdfFileName(d) {
+  let n = ((d && d.customer) || "")
+    .replace(/[\\/:*?"<>|\u0000-\u001f]/g, "") // remove illegal chars
+    .replace(/\s+/g, " ")
+    .trim();
+  n = n.slice(0, 60).trim();
+  if (!n) n = "SriDurga-Bill";  // fallback only when name is truly empty
+  return n + ".pdf";
+}
