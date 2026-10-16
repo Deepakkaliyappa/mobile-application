@@ -1185,14 +1185,12 @@ hr.dvd {
 .ph2-addr {
   font-family: "DM Sans", system-ui, sans-serif;
   font-size: 9.5px;
-  font-weight: 500;
+  font-weight: 700;      /* ← bold (was 500) */
   line-height: 1.5;
-  color: #5b6577;
+  color: #000000;
   text-transform: uppercase;
   letter-spacing: 0.2px;
 }
-
-.ph2-addr-bold { font-weight: 700; }
 
 
 /* ══ MAIN PAGE HEADER = same design as the "With Header" bill header ══
