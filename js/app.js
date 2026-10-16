@@ -871,7 +871,7 @@ function pdfFileName(d) {
   const splash = document.getElementById("splashScreen");
   if (!splash) return;
 
-  const MIN_SHOW = 2800;  // minimum time splash stays (ms)
+  const MIN_SHOW = 3500;  // minimum time splash stays (ms)
   const start = performance.now();
 
   function dismiss() {
