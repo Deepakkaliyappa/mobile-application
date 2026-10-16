@@ -866,3 +866,34 @@ function pdfFileName(d) {
   if (!n) n = "SriDurga-Bill";  // fallback only when name is truly empty
   return n + ".pdf";
 }
+/* ── Splash screen: hide after app is ready ── */
+(function hideSplash() {
+  const splash = document.getElementById("splashScreen");
+  if (!splash) return;
+
+  const MIN_SHOW = 1200;  // minimum time splash stays (ms)
+  const start = performance.now();
+
+  function dismiss() {
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, MIN_SHOW - elapsed);
+    setTimeout(() => {
+      splash.classList.add("hide");
+      // remove from DOM after fade-out so it never blocks anything
+      setTimeout(() => splash.remove(), 600);
+    }, wait);
+  }
+
+  // Dismiss once fonts + header are ready
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      fitAppHeader();
+      dismiss();
+    });
+  } else {
+    window.addEventListener("load", dismiss);
+  }
+
+  // Safety net: never show splash longer than 3 seconds
+  setTimeout(dismiss, 3000);
+})();
