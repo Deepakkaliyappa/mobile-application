@@ -380,7 +380,7 @@ function buildRowEl(it, i) {
     '<td style="padding:4px 4px;text-align:right;white-space:nowrap">' + esc(it.qty) + "</td>" +
     '<td style="padding:4px 4px;text-align:right;white-space:nowrap">' + esc(it.days) + "</td>" +
     '<td style="padding:4px 4px;text-align:right;white-space:nowrap">' +
-    (it.price === "" ? "" : "₹" + it.price) + "</td>";
+    (it.price === "" ? "" : it.price) + "</td>";
   return tr;
 }
 
