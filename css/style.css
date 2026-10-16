@@ -1125,16 +1125,25 @@ hr.dvd {
 .ph2 {
   box-sizing: border-box;
   width: 100%;
-  height: 43mm;                  /* header height 4.3cm (sheet width 14.5cm) */
+  height: 43mm;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding: 5px 22px;
   background: linear-gradient(135deg, #ffe9d6 0%, #e3f3fc 100%);
-  border-radius: 0 0 20px 20px;
+  border-radius: 0;              /* ← straight edges, no curve */
   text-align: center;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
+}
+/* App main-page header keeps its rounded corners */
+.ph2-app {
+  border-radius: 0 0 20px 20px !important;
+}
+
+/* Printed bill header (inside .bill-page) uses straight edges */
+.bill-page .ph2 {
+  border-radius: 0;
 }
 
 .ph2-row {
