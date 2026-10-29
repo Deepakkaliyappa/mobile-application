@@ -314,7 +314,7 @@ async function generate() {
   };
   await renderBill(window._B, currentFormat);
   document.getElementById("appUi").style.display = "none";
-  document.getElementById("printPage").style.display = "block";
+  document.getElementById("printPage").style.display = "flex";
   fitPreview();
   window.scrollTo(0, 0);
 }
