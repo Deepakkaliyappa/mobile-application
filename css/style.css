@@ -471,15 +471,34 @@ input[type="date"] {
 }
 
 /* ══ PREVIEW PAGE ══ */
+/* ══ PREVIEW PAGE ══ */
 #printPage {
   display: none;
   background: #d0d4da;
   width: 100%;
   min-height: 100vh;
   padding: 16px 10px;
+  flex-direction: column; /* Stacks the buttons on top of the paper */
+  align-items: center;    /* Centers the buttons and paper horizontally */
+}
+
+/* In app.js, when you show the page, it must say:
+   document.getElementById("printPage").style.display = "flex"; 
+   (Do NOT use "block", or it will break the centering on PC) */
+
+.print-outer {
+  width: 100%;
+  max-width: 480px;       /* Keeps the paper the same size as mobile */
+  margin: 0 auto;         /* Centers the paper */
+  background: #e6ebf1;
+  padding: 10px;
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .ptb-wrap {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto 14px;
   display: flex;
@@ -501,6 +520,7 @@ input[type="date"] {
 }
 
 .fmt-row {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto 10px;
   display: flex;
@@ -509,7 +529,7 @@ input[type="date"] {
 
 .fmt-btn {
   flex: 1;
-  padding: 10px 4px;
+  padding: 12px 4px;
   border: 2px solid var(--border);
   border-radius: 10px;
   font-family: "DM Sans", sans-serif;
@@ -520,6 +540,12 @@ input[type="date"] {
   color: #555;
   text-align: center;
   transition: all 0.18s;
+  white-space: nowrap; /* Prevents text from wrapping */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
 }
 
 .fmt-btn.active {
@@ -534,6 +560,7 @@ input[type="date"] {
 }
 
 .act-row {
+  width: 100%;
   max-width: 480px;
   margin: 0 auto 14px;
   display: flex;
@@ -542,14 +569,19 @@ input[type="date"] {
 
 .act-btn {
   flex: 1;
-  padding: 10px 4px;
+  padding: 12px 4px;
   border: none;
   border-radius: 9px;
   font-family: "DM Sans", sans-serif;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  white-space: nowrap; /* Prevents text from wrapping */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .tbp {
@@ -560,16 +592,6 @@ input[type="date"] {
 .tbd {
   background: var(--red);
   color: #fff;
-}
-
-.print-outer {
-  max-width: 480px;
-  margin: 0 auto;
-  background: #e6ebf1;
-  padding: 10px;
-  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.15);
-  border-radius: 12px;
-  overflow: hidden;
 }
 
 #billPage {
