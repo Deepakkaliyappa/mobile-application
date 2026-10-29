@@ -634,7 +634,7 @@ window.addEventListener("orientationchange", fitPreview);
 
 function goBack() {
   document.getElementById("printPage").style.display = "none";
-  document.getElementById("appUi").style.display = "flex";
+  document.getElementById("appUi").style.display = "block";
   fitAppHeader();
   window.scrollTo(0, 0);
 }
