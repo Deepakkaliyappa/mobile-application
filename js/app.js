@@ -356,10 +356,11 @@ const PAGE_TRIM_MM = 0.5;
 const CARRY_ROWS_WITH_TOTALS = 0;
 
 // Row limits per page (measured height can still lower these, never raise them).
-const MAX_ROWS_PER_PAGE = 11;       // a page that continues to the next one
-const ROWS_BOTH_ADJ = 10;           // totals group has Discount AND Advance
-const ROWS_ONE_ADJ = 11;            // only one of Discount / Advance entered
-const ROWS_NO_ADJ = 11;             // neither entered (Subtotal + Balance only)
+// Row limits per page (measured height can still lower these, never raise them).
+const MAX_ROWS_PER_PAGE = 17;       // Page 2 and onwards can fit up to 15 items
+const ROWS_BOTH_ADJ = 17;           // Last page: totals group has Discount AND Advance
+const ROWS_ONE_ADJ = 15;            // Last page: only one of Discount / Advance entered
+const ROWS_NO_ADJ = 15;             // Last page: neither entered (Subtotal + Balance only)
 
 // How many item rows may share a page with the totals group.
 function rowsWithTotals(d) {
@@ -540,8 +541,9 @@ function paginate(d, fmt, sandbox) {
     const foot = page.querySelector(".pg-foot");
     let count = 0;
 
-    // 1) Fill rows one by one (a "Continued" note is reserved at the bottom)
-    while (i < items.length && count < MAX_ROWS_PER_PAGE) {
+    // 1) Fill rows one by one (Page 1 gets 11 max, later pages get MAX_ROWS_PER_PAGE)
+    const currentLimit = pages.length === 0 ? 11 : MAX_ROWS_PER_PAGE;
+    while (i < items.length && count < currentLimit) {
       const tr = buildRowEl(items[i], i);
       tbody.appendChild(tr);
       if (count > 0 && !pageFits(page)) {
