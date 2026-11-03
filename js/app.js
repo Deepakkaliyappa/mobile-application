@@ -327,9 +327,8 @@ async function generate() {
   fitPreview();
   window.scrollTo(0, 0);
   
-  // Tell the phone's back button that we are on the preview page
+  // Add this line at the end of generate():
   history.pushState({ page: "preview" }, "", "#preview");
-}
 
 /* ═══════════════════════════════════════════════════════════════════
    PAGINATION ENGINE  (measure-based, line-by-line)
@@ -647,10 +646,8 @@ window.addEventListener("resize", fitPreview);
 window.addEventListener("orientationchange", fitPreview);
 
 function goBack() {
-  // If we are in the preview state, telling the browser to go back
-  // will trigger the 'popstate' event below, which switches the UI safely.
   if (history.state && history.state.page === "preview") {
-    history.back();
+    history.back(); // This triggers popstate, which switches the UI back
   } else {
     // Fallback just in case
     document.getElementById("printPage").style.display = "none";
@@ -943,16 +940,39 @@ window.addEventListener("popstate", function (e) {
 
 /* ── Navigation & Exit Confirmation Logic ── */
 
-// 1. Push a base state on load so the first back press doesn't immediately close the app
+// 1. Add a base state on load so the app doesn't close on the first back press
 history.pushState({ page: "main" }, "", "");
 
-// 2. Unified listener for the mobile Back button
+// 2. Add history states to your popups!
+function openModal(rowId) {
+  // ... (keep your exact existing code inside openModal up to the last line) ...
+  document.getElementById("itemModal").style.display = "flex";
+  document.body.style.overflow = "hidden";
+  setTimeout(() => document.getElementById("p_name").focus(), 50);
+  
+  // Add this single line at the end of openModal:
+  history.pushState({ page: "add-item" }, "", "#add-item");
+}
+
+function closeModal() {
+  // ... (keep your exact existing code inside closeModal) ...
+  document.getElementById("itemModal").style.display = "none";
+  document.body.style.overflow = "";
+  document.getElementById("suggestBox").style.display = "none";
+  
+  // Add this single line at the end of closeModal:
+  if (history.state && history.state.page === "add-item") {
+    history.back();
+  }
+}
+
+// 3. The Unified Back Button Listener
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
   const itemModal = document.getElementById("itemModal");
   const exitModal = document.getElementById("exitModal");
 
-  // A) If "Add Item" popup is open, close it
+  // A) If Add Item popup is open -> close it
   if (itemModal && itemModal.style.display === "flex") {
     itemModal.style.display = "none";
     document.body.style.overflow = "";
@@ -960,7 +980,7 @@ window.addEventListener("popstate", function (e) {
     return;
   }
 
-  // B) If the preview page is open, go back to the main form
+  // B) If Preview page is open -> go back to main form
   if (printPage && printPage.style.display === "flex") {
     printPage.style.display = "none";
     document.getElementById("appUi").style.display = "block";
@@ -969,8 +989,15 @@ window.addEventListener("popstate", function (e) {
     return;
   }
 
-  // C) If we are on the MAIN page, show the Exit popup
-  if (exitModal && exitModal.style.display !== "flex") {
+  // C) If Exit popup is open -> close it
+  if (exitModal && exitModal.style.display === "flex") {
+    exitModal.style.display = "none";
+    document.body.style.overflow = "";
+    return;
+  }
+
+  // D) If we are on the MAIN page -> show the Exit popup
+  if (history.state && history.state.page === "main") {
     exitModal.style.display = "flex";
     document.body.style.overflow = "hidden";
     
@@ -979,22 +1006,20 @@ window.addEventListener("popstate", function (e) {
   }
 });
 
-// 3. Exit Popup Actions
+// 4. Exit Popup Actions
 function cancelExit() {
   document.getElementById("exitModal").style.display = "none";
   document.body.style.overflow = "";
 }
 
 function confirmExit() {
-  // Try to close the app/webview (works in APKs)
   if (navigator.app) {
     navigator.app.exitApp(); 
   } else if (navigator.device && navigator.device.exitApp) {
     navigator.device.exitApp();
   } else if (window.Android) {
-    window.Android.exitApp(); // For custom Android WebView wrappers
+    window.Android.exitApp();
   } else {
-    // Fallback for standard web browsers
     window.close(); 
     alert("Please press the home button on your phone to exit.");
   }
