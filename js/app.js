@@ -911,16 +911,13 @@ function pdfFileName(d) {
   setTimeout(dismiss, 3000);
 })();
 // Listen for the physical mobile back button
+// Listen for the physical mobile back button
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
-  const appUi = document.getElementById("appUi");
   
   // If the preview page is currently open, go back to the form
   if (printPage && printPage.style.display === "flex") {
-    printPage.style.display = "none";
-    appUi.style.display = "block";
-    fitAppHeader();
-    window.scrollTo(0, 0);
+    showAppForm();
   }
 });
 
