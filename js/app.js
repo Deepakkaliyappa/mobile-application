@@ -941,23 +941,26 @@ window.addEventListener("popstate", function (e) {
   }
 });
 
-/* ── Exit Confirmation Logic ── */
-let isExitModalOpen = false;
+/* ── Navigation & Exit Confirmation Logic ── */
 
-// 1. Push a dummy state on load so the first back button press doesn't close the app
+// 1. Push a base state on load so the first back press doesn't immediately close the app
 history.pushState({ page: "main" }, "", "");
 
-// 2. Listen for the Back button
+// 2. Unified listener for the mobile Back button
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
   const itemModal = document.getElementById("itemModal");
+  const exitModal = document.getElementById("exitModal");
 
-  // If "Add Item" popup is open, close it (handled by your existing code, but safe here)
+  // A) If "Add Item" popup is open, close it
   if (itemModal && itemModal.style.display === "flex") {
-    return; 
+    itemModal.style.display = "none";
+    document.body.style.overflow = "";
+    document.getElementById("suggestBox").style.display = "none";
+    return;
   }
 
-  // If the preview page is open, go back to the form
+  // B) If the preview page is open, go back to the main form
   if (printPage && printPage.style.display === "flex") {
     printPage.style.display = "none";
     document.getElementById("appUi").style.display = "block";
@@ -966,21 +969,18 @@ window.addEventListener("popstate", function (e) {
     return;
   }
 
-  // If we are on the main page and they press back -> show the exit popup
-  if (history.state && history.state.page === "main") {
-    if (!isExitModalOpen) {
-      isExitModalOpen = true;
-      document.getElementById("exitModal").style.display = "flex";
-      document.body.style.overflow = "hidden";
-      
-      // Push the state back so they can press back again after cancelling
-      history.pushState({ page: "main" }, "", "");
-    }
+  // C) If we are on the MAIN page, show the Exit popup
+  if (exitModal && exitModal.style.display !== "flex") {
+    exitModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    
+    // Push a state immediately so pressing back again while popup is open doesn't close the app
+    history.pushState({ page: "main" }, "", "");
   }
 });
 
-function closeExitModal() {
-  isExitModalOpen = false;
+// 3. Exit Popup Actions
+function cancelExit() {
   document.getElementById("exitModal").style.display = "none";
   document.body.style.overflow = "";
 }
@@ -991,10 +991,11 @@ function confirmExit() {
     navigator.app.exitApp(); 
   } else if (navigator.device && navigator.device.exitApp) {
     navigator.device.exitApp();
+  } else if (window.Android) {
+    window.Android.exitApp(); // For custom Android WebView wrappers
   } else {
-    // Fallback for standard web browsers (can't close a tab not opened by script)
+    // Fallback for standard web browsers
     window.close(); 
-    // If window.close() fails, show a friendly message
     alert("Please press the home button on your phone to exit.");
   }
 }
