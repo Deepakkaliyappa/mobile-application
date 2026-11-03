@@ -327,8 +327,9 @@ async function generate() {
   fitPreview();
   window.scrollTo(0, 0);
   
-  // Add this line at the end of generate():
+  // Tell the phone's back button that we are on the preview page
   history.pushState({ page: "preview" }, "", "#preview");
+}
 
 /* ═══════════════════════════════════════════════════════════════════
    PAGINATION ENGINE  (measure-based, line-by-line)
@@ -646,8 +647,10 @@ window.addEventListener("resize", fitPreview);
 window.addEventListener("orientationchange", fitPreview);
 
 function goBack() {
+  // If we are in the preview state, telling the browser to go back
+  // will trigger the 'popstate' event below, which switches the UI safely.
   if (history.state && history.state.page === "preview") {
-    history.back(); // This triggers popstate, which switches the UI back
+    history.back();
   } else {
     // Fallback just in case
     document.getElementById("printPage").style.display = "none";
