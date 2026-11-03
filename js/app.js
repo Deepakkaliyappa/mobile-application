@@ -190,21 +190,12 @@ function openModal(rowId) {
   document.getElementById("itemModal").style.display = "flex";
   document.body.style.overflow = "hidden"; // lock page scroll behind popup
   setTimeout(() => document.getElementById("p_name").focus(), 50);
-    // 👇 ADD THIS LINE
-  history.pushState({ modal: "open" }, "", "#add-item");
 }
 
 function closeModal() {
   document.getElementById("itemModal").style.display = "none";
   document.body.style.overflow = "";
   document.getElementById("suggestBox").style.display = "none";
-
-  // 👇 ADD THIS BLOCK
-  // If the user closed the modal manually (not via back button), 
-  // remove the history state we added.
-  if (history.state && history.state.modal === "open") {
-    history.back(); // This triggers popstate, which closes the modal safely
-  }
 }
 
 function saveModal() {
@@ -550,7 +541,8 @@ function paginate(d, fmt, sandbox) {
     const foot = page.querySelector(".pg-foot");
     let count = 0;
 
-    // 1) Fill rows one by one (Page 1 gets 11 max, later pages get MAX_ROWS_PER_PAGE)
+    // 1) Fill rows one by one (a "Continued" note is reserved at the bottom)
+      // 1) Fill rows one by one (Page 1 gets 11 max, later pages get MAX_ROWS_PER_PAGE)
     const currentLimit = pages.length === 0 ? 11 : MAX_ROWS_PER_PAGE;
     while (i < items.length && count < currentLimit) {
       const tr = buildRowEl(items[i], i);
@@ -892,7 +884,7 @@ function pdfFileName(d) {
   const splash = document.getElementById("splashScreen");
   if (!splash) return;
 
-  const MIN_SHOW = 3500;  // minimum time splash stays (ms)
+  const MIN_SHOW = 800;  // minimum time splash stays (ms)
   const start = performance.now();
 
   function dismiss() {
@@ -919,24 +911,16 @@ function pdfFileName(d) {
   setTimeout(dismiss, 3000);
 })();
 // Listen for the physical mobile back button
-// Listen for the physical mobile back button
-// Listen for the physical mobile back button
-// Listen for the physical mobile back button
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
-  const itemModal = document.getElementById("itemModal");
+  const appUi = document.getElementById("appUi");
   
-  // 1. If "Add Item" popup is open, close it
-  if (itemModal && itemModal.style.display === "flex") {
-    itemModal.style.display = "none";
-    document.body.style.overflow = "";
-    document.getElementById("suggestBox").style.display = "none";
-  }
-  // 2. If the preview page is open, go back to the form
-  else if (printPage && printPage.style.display === "flex") {
+  // If the preview page is currently open, go back to the form
+  if (printPage && printPage.style.display === "flex") {
     printPage.style.display = "none";
-    document.getElementById("appUi").style.display = "block";
+    appUi.style.display = "block";
     fitAppHeader();
     window.scrollTo(0, 0);
   }
 });
+```
