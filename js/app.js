@@ -190,12 +190,21 @@ function openModal(rowId) {
   document.getElementById("itemModal").style.display = "flex";
   document.body.style.overflow = "hidden"; // lock page scroll behind popup
   setTimeout(() => document.getElementById("p_name").focus(), 50);
+    // 👇 ADD THIS LINE
+  history.pushState({ modal: "open" }, "", "#add-item");
 }
 
 function closeModal() {
   document.getElementById("itemModal").style.display = "none";
   document.body.style.overflow = "";
   document.getElementById("suggestBox").style.display = "none";
+
+  // 👇 ADD THIS BLOCK
+  // If the user closed the modal manually (not via back button), 
+  // remove the history state we added.
+  if (history.state && history.state.modal === "open") {
+    history.back(); // This triggers popstate, which closes the modal safely
+  }
 }
 
 function saveModal() {
@@ -922,10 +931,19 @@ function pdfFileName(d) {
 // Listen for the physical mobile back button
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
+  const itemModal = document.getElementById("itemModal");
   
-  // If the preview page is currently open, go back to the form
-  if (printPage && printPage.style.display === "flex") {
-    showAppForm();
+  // 1. If "Add Item" popup is open, close it
+  if (itemModal && itemModal.style.display === "flex") {
+    itemModal.style.display = "none";
+    document.body.style.overflow = "";
+    document.getElementById("suggestBox").style.display = "none";
+  }
+  // 2. If the preview page is open, go back to the form
+  else if (printPage && printPage.style.display === "flex") {
+    printPage.style.display = "none";
+    document.getElementById("appUi").style.display = "block";
+    fitAppHeader();
+    window.scrollTo(0, 0);
   }
 });
-
