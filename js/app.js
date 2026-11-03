@@ -318,10 +318,8 @@ async function generate() {
   fitPreview();
   window.scrollTo(0, 0);
   
-  // Push a history state ONLY if we are not already in one
-  if (!history.state || history.state.page !== "preview") {
-    history.pushState({ page: "preview" }, "", "#preview");
-  }
+  // Tell the phone's back button that we are on the preview page
+  history.pushState({ page: "preview" }, "", "#preview");
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -640,23 +638,17 @@ window.addEventListener("resize", fitPreview);
 window.addEventListener("orientationchange", fitPreview);
 
 function goBack() {
-  // If we are in the preview state, go back in history (fires popstate)
+  // If we are in the preview state, telling the browser to go back
+  // will trigger the 'popstate' event below, which switches the UI safely.
   if (history.state && history.state.page === "preview") {
     history.back();
   } else {
-    // Fallback just in case history is lost
-    showAppForm();
+    // Fallback just in case
+    document.getElementById("printPage").style.display = "none";
+    document.getElementById("appUi").style.display = "block";
+    fitAppHeader();
+    window.scrollTo(0, 0);
   }
-}
-
-// Helper function to switch UI back to the form
-function showAppForm() {
-  const printPage = document.getElementById("printPage");
-  const appUi = document.getElementById("appUi");
-  if (printPage) printPage.style.display = "none";
-  if (appUi) appUi.style.display = "block";
-  fitAppHeader();
-  window.scrollTo(0, 0);
 }
 
 async function doPrint() {
@@ -919,11 +911,16 @@ function pdfFileName(d) {
 })();
 // Listen for the physical mobile back button
 // Listen for the physical mobile back button
+// Listen for the physical mobile back button
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
+  const appUi = document.getElementById("appUi");
   
   // If the preview page is currently open, go back to the form
   if (printPage && printPage.style.display === "flex") {
-    showAppForm();
+    printPage.style.display = "none";
+    appUi.style.display = "block";
+    fitAppHeader();
+    window.scrollTo(0, 0);
   }
 });
