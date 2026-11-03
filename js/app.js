@@ -4,6 +4,7 @@ let rowCtr = 0;
 let currentFormat = "plain";
 // Create a base history state so the very first back press doesn't close the app
 history.pushState({ page: "main" }, "", "");
+let isModalOpen = false;
 
 function onHeadingChange() {
   const sel = document.getElementById("headingSelect");
@@ -189,23 +190,23 @@ function openModal(rowId) {
     document.getElementById("p_days").value = "";
     document.getElementById("p_price").value = "";
   }
+  
+  isModalOpen = true; // Lock it open
   document.getElementById("itemModal").style.display = "flex";
-  document.body.style.overflow = "hidden"; // lock page scroll behind popup
+  document.body.style.overflow = "hidden";
   setTimeout(() => document.getElementById("p_name").focus(), 50);
-    // 👇 ADD THIS LINE
+  
   history.pushState({ modal: "open" }, "", "#add-item");
 }
 
 function closeModal() {
+  isModalOpen = false; // Unlock it
   document.getElementById("itemModal").style.display = "none";
   document.body.style.overflow = "";
   document.getElementById("suggestBox").style.display = "none";
 
-  // 👇 ADD THIS BLOCK
-  // If the user closed the modal manually (not via back button), 
-  // remove the history state we added.
   if (history.state && history.state.modal === "open") {
-    history.back(); // This triggers popstate, which closes the modal safely
+    history.back(); // This cleans up the history safely
   }
 }
 
@@ -921,21 +922,22 @@ function pdfFileName(d) {
   setTimeout(dismiss, 3000);
 })();
 // Listen for the physical mobile back button
-// Listen for the physical mobile back button
+// Listen for the physical mobile back button AND browser back arrow
 window.addEventListener("popstate", function (e) {
   const printPage = document.getElementById("printPage");
   const itemModal = document.getElementById("itemModal");
   const exitModal = document.getElementById("exitModal");
 
-  // 1. If "Add Item" popup is open, close it (Kept exactly as you had it)
+  // 1. If "Add Item" popup is open, close it
   if (itemModal && itemModal.style.display === "flex") {
+    isModalOpen = false;
     itemModal.style.display = "none";
     document.body.style.overflow = "";
     document.getElementById("suggestBox").style.display = "none";
     return;
   }
   
-  // 2. If the preview page is open, go back to the form (Kept exactly as you had it)
+  // 2. If the preview page is open, go back to the form
   if (printPage && printPage.style.display === "flex") {
     printPage.style.display = "none";
     document.getElementById("appUi").style.display = "block";
@@ -945,8 +947,8 @@ window.addEventListener("popstate", function (e) {
   }
 
   // 3. If we are on the MAIN page, show the Exit popup
-  // (We check if it's not already open to prevent glitches)
-  if (exitModal && exitModal.style.display !== "flex") {
+  // We ONLY do this if the Modal isn't in the middle of closing, and Exit popup isn't already open
+  if (!isModalOpen && exitModal && exitModal.style.display !== "flex") {
     exitModal.style.display = "flex";
     document.body.style.overflow = "hidden";
     
@@ -954,7 +956,6 @@ window.addEventListener("popstate", function (e) {
     history.pushState({ page: "main" }, "", "");
   }
 });
-
 // Exit Popup Actions
 function cancelExit() {
   document.getElementById("exitModal").style.display = "none";
