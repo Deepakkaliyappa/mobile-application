@@ -291,7 +291,10 @@ body{background:var(--bg)}
 
 @media print{#printPage .pv-info{display:none!important}#printPage{padding:0!important;animation:none!important}#printPage .page-scaler{border-radius:0!important}}
 
-/* ═══ Splash: "Tap to continue" ═══ */
-#splashScreen.ready .splash-loader{display:none}
-.splash-tap{margin-top:22px;font-size:14px;font-weight:700;letter-spacing:.4px;color:#8a94a6;animation:tapPulse 1.4s ease-in-out infinite}
-@keyframes tapPulse{0%,100%{opacity:.35}50%{opacity:1}}
+/* ═══ Add Item popup: the WHOLE popup scrolls (needed when the keyboard is open) ═══ */
+#itemModal .modal-box{display:block!important;overflow-y:auto!important;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+#itemModal .modal-body{overflow:visible!important;flex:none!important;min-height:0}
+#itemModal .modal-ftr{position:static!important}
+#itemModal .modal-box::-webkit-scrollbar{width:4px}
+#itemModal .modal-box::-webkit-scrollbar-thumb{background:rgba(120,130,150,.45);border-radius:4px}
