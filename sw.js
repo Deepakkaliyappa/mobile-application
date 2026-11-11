@@ -2,7 +2,7 @@
    1) Pre-saves every app file on first visit, so the app opens fully OFFLINE.
    2) Network-first: when online it always loads the newest files.
    Change CACHE (e.g. v9) whenever you upload new files, to refresh every phone. */
-const CACHE = "sd-billing-v9";
+const CACHE = "sd-billing-v10";
 const CORE = [
   "./", "index.html", "manifest.json",
   "css/style.css", "css/ui.css", "css/fonts.css",
