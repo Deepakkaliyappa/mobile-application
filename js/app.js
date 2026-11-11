@@ -896,56 +896,36 @@ function pdfFileName(d) {
   if (!n) n = "SriDurga-Bill";  // fallback only when name is truly empty
   return n + ".pdf";
 }
-/* ── Splash screen: when ready, wait for ONE tap (this tap is what lets the
-      browser trust our Back-button guard, so the exit popup always works) ── */
+/* ── Splash screen: hide after app is ready ── */
 (function hideSplash() {
   const splash = document.getElementById("splashScreen");
   if (!splash) return;
 
   const MIN_SHOW = 800;  // minimum time splash stays (ms)
   const start = performance.now();
-  let ready = false, closed = false;
 
-  function closeSplash() {
-    if (!ready || closed) return;
-    closed = true;
-    splash.classList.add("hide");
-    setTimeout(() => splash.remove(), 600);
-  }
-
-  function showTap() {
-    if (ready) return;
-    const wait = Math.max(0, MIN_SHOW - (performance.now() - start));
+  function dismiss() {
+    const elapsed = performance.now() - start;
+    const wait = Math.max(0, MIN_SHOW - elapsed);
     setTimeout(() => {
-      ready = true;
-      splash.classList.add("ready");
-      const inner = splash.querySelector(".splash-inner");
-      if (inner && !inner.querySelector(".splash-tap")) {
-        const t = document.createElement("div");
-        t.className = "splash-tap";
-        t.textContent = "Tap to continue";
-        inner.appendChild(t);
-      }
+      splash.classList.add("hide");
+      // remove from DOM after fade-out so it never blocks anything
+      setTimeout(() => splash.remove(), 600);
     }, wait);
   }
 
-  ["click", "touchend", "keydown"].forEach(function (ev) {
-    splash.addEventListener(ev, closeSplash);
-  });
-  document.addEventListener("keydown", closeSplash);
-
-  // Show "Tap to continue" once fonts + header are ready
+  // Dismiss once fonts + header are ready
   if (document.fonts && document.fonts.ready) {
     document.fonts.ready.then(() => {
       fitAppHeader();
-      showTap();
+      dismiss();
     });
   } else {
-    window.addEventListener("load", showTap);
+    window.addEventListener("load", dismiss);
   }
 
-  // Safety net: if something stalls, still show the tap prompt after 3 seconds
-  setTimeout(showTap, 3000);
+  // Safety net: never show splash longer than 3 seconds
+  setTimeout(dismiss, 3000);
 })();
 // Listen for the physical mobile back button
 // Listen for the physical mobile back button
