@@ -947,3 +947,48 @@ window.addEventListener("popstate", function (e) {
     window.scrollTo(0, 0);
   }
 });
+
+/* ═══════════════════════════════════════════════════════════════════
+   EXIT CONFIRMATION  (back button on the main page)
+   History stack:  [ base ] → [ main ] → (modal / preview on top)
+   Pressing Back on "main" lands on "base" → we show the popup and
+   push "main" again so the user stays on the page until they confirm.
+   ═══════════════════════════════════════════════════════════════════ */
+(function initExitGuard() {
+  if (!history.state || history.state.page !== "main") {
+    history.replaceState({ page: "base" }, "", location.href);
+    history.pushState({ page: "main" }, "", location.href);
+  }
+})();
+
+let _exiting = false;
+
+function isExitOpen() {
+  const m = document.getElementById("exitModal");
+  return m && m.style.display === "flex";
+}
+function showExitDialog() {
+  document.getElementById("exitModal").style.display = "flex";
+  document.body.style.overflow = "hidden";
+}
+function exitCancel() {
+  document.getElementById("exitModal").style.display = "none";
+  document.body.style.overflow = "";
+}
+function exitConfirm() {
+  _exiting = true;
+  exitCancel();
+  window.close();                              // works if the browser allows it
+  setTimeout(() => history.go(-2), 50);        // step back past our two entries → leaves the installed app
+  setTimeout(() => {                           // last resort if the tab is still alive
+    if (document.visibilityState === "visible") location.replace("about:blank");
+  }, 600);
+}
+
+window.addEventListener("popstate", function (e) {
+  if (_exiting) return;
+  if (e.state && e.state.page === "base") {
+    history.pushState({ page: "main" }, "", location.href); // stay on the page
+    if (!isExitOpen()) showExitDialog();
+  }
+});
