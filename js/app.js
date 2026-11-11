@@ -949,27 +949,30 @@ window.addEventListener("popstate", function (e) {
 });
 
 /* ═══════════════════════════════════════════════════════════════════
-   EXIT CONFIRMATION  (back button on the main page)
-   History stack:  [ base ] → [ main ] → (modal / preview on top)
-   Pressing Back on "main" lands on "base" → we show the popup and
-   push "main" again so the user stays on the page until they confirm.
+   EXIT CONFIRMATION  (Back button on the main page)
+   History stack:  [ base ] → [ g1 ] → [ g2 ] → (modal / preview on top)
+   Back from g2 lands on g1 → we show the popup and go FORWARD to g2
+   again (no new history entry is created, so the browser can't skip it).
+   g2 is created on the first tap, because browsers ignore entries made
+   before the user has touched the page.
    ═══════════════════════════════════════════════════════════════════ */
-let _guardReady = false;
-function armExitGuard() {
-  if (_guardReady) return;
-  _guardReady = true;
-  if (history.state && history.state.page === "main") return;
-  history.replaceState({ page: "base" }, "", location.href);
-  history.pushState({ page: "main" }, "", location.href);
-}
-/* Browsers ignore history entries created before the user touches the page
-   (they skip them on Back and close the app). So we create ours on the
-   FIRST tap/click/key, before any button handler runs. */
-["pointerup", "touchend", "click", "keydown"].forEach(function (t) {
-  document.addEventListener(t, armExitGuard, { capture: true, once: false });
-});
-
 let _exiting = false;
+
+(function initExitGuard() {
+  if (history.state && history.state.page === "g") return;   // reload: already set up
+  history.replaceState({ page: "base" }, "", location.href);
+  history.pushState({ page: "g", n: 1 }, "", location.href);
+})();
+
+function armExitGuard() {
+  const st = history.state;
+  if (st && st.page === "g" && st.n === 1) {
+    history.pushState({ page: "g", n: 2 }, "", location.href);
+  }
+}
+["pointerup", "touchend", "click", "keydown"].forEach(function (t) {
+  document.addEventListener(t, armExitGuard, true);
+});
 
 function isExitOpen() {
   const m = document.getElementById("exitModal");
@@ -986,17 +989,29 @@ function exitCancel() {
 function exitConfirm() {
   _exiting = true;
   exitCancel();
-  window.close();                              // works if the browser allows it
-  setTimeout(() => history.go(-2), 50);        // step back past our two entries → leaves the installed app
-  setTimeout(() => {                           // last resort if the tab is still alive
-    if (document.visibilityState === "visible") location.replace("about:blank");
-  }, 600);
+  try { window.close(); } catch (e) {}
+  let tries = 0;                                  // walk back out of the app
+  const t = setInterval(function () {
+    if (++tries > 8) {
+      clearInterval(t);
+      if (document.visibilityState === "visible") location.replace("about:blank");
+      return;
+    }
+    history.back();
+  }, 120);
 }
 
 window.addEventListener("popstate", function (e) {
   if (_exiting) return;
-  if (e.state && e.state.page === "base") {
-    history.pushState({ page: "main" }, "", location.href); // stay on the page
-    if (!isExitOpen()) showExitDialog();
+  const st = e.state || {};
+  if (st.page === "g" && st.n === 1) {
+    // Back pressed on the main page → ask, and go forward to g2 again
+    showExitDialog();
+    history.go(1);
+  } else if (st.page === "base" || !e.state) {
+    // Landed on the entry before our guard → rebuild the guard and ask
+    history.pushState({ page: "g", n: 1 }, "", location.href);
+    history.pushState({ page: "g", n: 2 }, "", location.href);
+    showExitDialog();
   }
 });
