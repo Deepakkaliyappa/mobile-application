@@ -170,6 +170,20 @@
     </div>
   </div>
 
+  <!-- ===== EXIT CONFIRM POPUP ===== -->
+  <div id="exitModal" class="modal-overlay" style="z-index:200;">
+    <div class="modal-box">
+      <div class="modal-hdr">Exit App</div>
+      <div class="modal-body" style="font-size:15px;font-weight:600;line-height:1.5;">
+        Are you sure want to exit?
+      </div>
+      <div class="modal-ftr">
+        <button class="m-btn m-cancel" onclick="exitCancel()">Cancel</button>
+        <button class="m-btn m-save" onclick="exitConfirm()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== BILL PREVIEW / PRINT ===== -->
   <div id="printPage">
     <div class="ptb-wrap">
