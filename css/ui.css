@@ -290,3 +290,8 @@ body{background:var(--bg)}
 #printPage .pv-chip.pay{background:#e7f8ef;color:#12875a}
 
 @media print{#printPage .pv-info{display:none!important}#printPage{padding:0!important;animation:none!important}#printPage .page-scaler{border-radius:0!important}}
+
+/* ═══ Splash: "Tap to continue" ═══ */
+#splashScreen.ready .splash-loader{display:none}
+.splash-tap{margin-top:22px;font-size:14px;font-weight:700;letter-spacing:.4px;color:#8a94a6;animation:tapPulse 1.4s ease-in-out infinite}
+@keyframes tapPulse{0%,100%{opacity:.35}50%{opacity:1}}
