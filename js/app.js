@@ -1015,3 +1015,40 @@ window.addEventListener("popstate", function (e) {
     showExitDialog();
   }
 });
+
+/* ═══════════════════════════════════════════════════════════════════
+   KEYBOARD-AWARE POPUPS
+   When the on-screen keyboard opens, fit the popup into the part of the
+   screen that is still visible, and keep the focused field in view.
+   ═══════════════════════════════════════════════════════════════════ */
+function fitPopupsToKeyboard() {
+  const vv = window.visualViewport;
+  const overlays = document.querySelectorAll("#itemModal, #exitModal");
+  overlays.forEach(function (ov) {
+    const box = ov.querySelector(".modal-box");
+    if (!vv) return;
+    ov.style.top = vv.offsetTop + "px";
+    ov.style.bottom = "auto";
+    ov.style.height = vv.height + "px";
+    if (box) box.style.maxHeight = Math.max(200, vv.height - 24) + "px";
+  });
+}
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", function () {
+    fitPopupsToKeyboard();
+    const a = document.activeElement;
+    if (a && a.closest && a.closest(".modal-body")) {
+      setTimeout(function () { a.scrollIntoView({ block: "center", behavior: "smooth" }); }, 50);
+    }
+  });
+  window.visualViewport.addEventListener("scroll", fitPopupsToKeyboard);
+}
+document.addEventListener("focusin", function (e) {
+  if (e.target.closest && e.target.closest(".modal-body")) {
+    fitPopupsToKeyboard();
+    setTimeout(function () {
+      fitPopupsToKeyboard();
+      e.target.scrollIntoView({ block: "center", behavior: "smooth" });
+    }, 300);   // wait for the keyboard animation
+  }
+});
