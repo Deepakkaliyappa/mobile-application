@@ -954,12 +954,20 @@ window.addEventListener("popstate", function (e) {
    Pressing Back on "main" lands on "base" → we show the popup and
    push "main" again so the user stays on the page until they confirm.
    ═══════════════════════════════════════════════════════════════════ */
-(function initExitGuard() {
-  if (!history.state || history.state.page !== "main") {
-    history.replaceState({ page: "base" }, "", location.href);
-    history.pushState({ page: "main" }, "", location.href);
-  }
-})();
+let _guardReady = false;
+function armExitGuard() {
+  if (_guardReady) return;
+  _guardReady = true;
+  if (history.state && history.state.page === "main") return;
+  history.replaceState({ page: "base" }, "", location.href);
+  history.pushState({ page: "main" }, "", location.href);
+}
+/* Browsers ignore history entries created before the user touches the page
+   (they skip them on Back and close the app). So we create ours on the
+   FIRST tap/click/key, before any button handler runs. */
+["pointerup", "touchend", "click", "keydown"].forEach(function (t) {
+  document.addEventListener(t, armExitGuard, { capture: true, once: false });
+});
 
 let _exiting = false;
 
