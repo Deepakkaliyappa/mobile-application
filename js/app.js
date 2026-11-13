@@ -989,14 +989,21 @@ function exitCancel() {
 function exitConfirm() {
   _exiting = true;
   exitCancel();
-  try { window.close(); } catch (e) {}
-  let tries = 0;                                  // walk back out of the app
-  const t = setInterval(function () {
-    if (++tries > 8) {
-      clearInterval(t);
-      if (document.visibilityState === "visible") location.replace("about:blank");
-      return;
+
+  // 1) Wrapped apps (Capacitor / Cordova) can close themselves directly
+  try {
+    if (window.Capacitor && Capacitor.Plugins && Capacitor.Plugins.App && Capacitor.Plugins.App.exitApp) {
+      Capacitor.Plugins.App.exitApp(); return;
     }
+    if (navigator.app && navigator.app.exitApp) { navigator.app.exitApp(); return; }
+  } catch (e) {}
+
+  // 2) Browser / installed web app: close if allowed, then walk back out of
+  //    our history entries. NO blank page is ever opened.
+  try { window.close(); } catch (e) {}
+  let tries = 0;
+  const t = setInterval(function () {
+    if (++tries > 4) { clearInterval(t); return; }
     history.back();
   }, 120);
 }
