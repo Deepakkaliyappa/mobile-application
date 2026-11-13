@@ -298,3 +298,13 @@ body{background:var(--bg)}
 #itemModal .modal-ftr{position:static!important}
 #itemModal .modal-box::-webkit-scrollbar{width:4px}
 #itemModal .modal-box::-webkit-scrollbar-thumb{background:rgba(120,130,150,.45);border-radius:4px}
+
+/* ═══ Preview page: keep the white bars as wide as the bill sheet (not the whole screen) ═══ */
+#printPage .ptb-wrap,
+#printPage .fmt-row{width:100%;max-width:820px;margin-left:auto;margin-right:auto;padding-left:14px;padding-right:14px}
+#printPage .act-row{left:50%;right:auto;transform:translateX(-50%);width:100%;max-width:820px;
+  padding-left:14px;padding-right:14px;border-radius:18px 18px 0 0}
+@media (min-width:840px){
+  #printPage .ptb-wrap,#printPage .fmt-row,#printPage .act-row{padding-left:8px;padding-right:8px}
+  #printPage .fmt-row{border-radius:0 0 18px 18px}
+}
